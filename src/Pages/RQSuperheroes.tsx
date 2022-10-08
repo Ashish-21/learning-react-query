@@ -4,12 +4,19 @@ import axios from "axios";
 
 function RQSuperheroes() {
 	const QUERY_KEY = "superheroes";
-	const { isLoading, data } = useQuery<any>([QUERY_KEY], () => {
-		return axios.get("http://localhost:4000/superheroes");
-	});
+	const { isLoading, data, isError, error } = useQuery<any>(
+		[QUERY_KEY],
+		() => {
+			return axios.get("http://localhost:4000/superheroes");
+		}
+	);
 	console.log(data);
 	if (isLoading) {
 		return <p>Loading...</p>;
+	}
+
+	if (isError && error instanceof Error) {
+		return <p>{error.message}</p>;
 	}
 	return (
 		<div>
