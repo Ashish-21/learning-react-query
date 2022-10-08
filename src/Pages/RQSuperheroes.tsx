@@ -13,8 +13,20 @@ function RQSuperheroes() {
 		},
 		{
 			cacheTime: 6000,
+			staleTime: 3000,
+			refetchOnMount: true,
+			refetchInterval: 2000,
+			refetchOnWindowFocus: true,
+			refetchIntervalInBackground: true,
 		}
 	);
+
+	// Cache Time : 6 seconds tak data cache me se uthaega but netwrok refetch hosakta h under certain conditions which will again update the cache
+	// Stale Time : 3 seconds tak koi bhi network refetch request nahi hoga after first fresh request , data fresh state me hi rahega, after 3 seconds stale hoajega means purana rahega and network refetch request ho sakta h
+	// refetchOnMount : whenever we mount the component the query will execute if set to true and data is stale
+	// refetchOnWindowFocus : whenever app window will loose focus and again gain it , background refetch will occure to keep data in sync with BE
+	// refetchInterval: har 2sec me api call hoga but window is not focussed then refetch nahi hoga uske liye refetchInBackground ko true karo
+
 	console.log(data);
 	if (isLoading) {
 		return <p>Loading...</p>;
