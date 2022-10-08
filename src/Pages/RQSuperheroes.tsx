@@ -4,10 +4,15 @@ import axios from "axios";
 
 function RQSuperheroes() {
 	const QUERY_KEY = "superheroes";
+
+	// Default cache time of react query is 5 minutes
 	const { isLoading, data, isError, error } = useQuery<any>(
 		[QUERY_KEY],
 		() => {
 			return axios.get("http://localhost:4000/superheroes");
+		},
+		{
+			cacheTime: 6000,
 		}
 	);
 	console.log(data);
