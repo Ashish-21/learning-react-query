@@ -53,8 +53,14 @@ function RQSuperheroes() {
 	};
 
 	const { mutate: addHero } = useMutation(postSuperHeroes, {
-		onSuccess: () => {
-			queryClient.invalidateQueries([QUERY_KEY]);
+		onSuccess: (data) => {
+			//queryClient.invalidateQueries([QUERY_KEY]);
+			queryClient.setQueryData([QUERY_KEY], (oldData: any) => {
+				return {
+					...oldData,
+					data: [...oldData.data, data.data],
+				};
+			});
 		},
 	});
 
