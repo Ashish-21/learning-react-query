@@ -1,6 +1,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 function RQSuperheroes() {
 	const QUERY_KEY = "superheroes";
@@ -13,25 +14,26 @@ function RQSuperheroes() {
 		console.log(error);
 	};
 	// Default cache time of react query is 5 minutes
-	const { isLoading, data, isError, error, refetch } = useQuery<any>(
-		[QUERY_KEY],
-		() => {
-			return axios.get("http://localhost:4000/superheroes1");
-		},
-		{
-			enabled: false,
-			onSuccess,
-			onError,
-		}
-		// {
-		// 	cacheTime: 6000,
-		// 	staleTime: 3000,
-		// 	refetchOnMount: true,
-		// 	refetchInterval: 2000,
-		// 	refetchOnWindowFocus: true,
-		// 	refetchIntervalInBackground: true,
-		// }
-	);
+	const { isLoading, data, isError, error, refetch, isFetching } =
+		useQuery<any>(
+			[QUERY_KEY],
+			() => {
+				return axios.get("http://localhost:4000/superheroes");
+			},
+			{
+				enabled: false,
+				onSuccess,
+				onError,
+			}
+			// {
+			// 	cacheTime: 6000,
+			// 	staleTime: 3000,
+			// 	refetchOnMount: true,
+			// 	refetchInterval: 2000,
+			// 	refetchOnWindowFocus: true,
+			// 	refetchIntervalInBackground: true,
+			// }
+		);
 
 	// Cache Time : 6 seconds tak data cache me se uthaega but netwrok refetch hosakta h under certain conditions which will again update the cache
 	// Stale Time : 3 seconds tak koi bhi network refetch request nahi hoga after first fresh request , data fresh state me hi rahega, after 3 seconds stale hoajega means purana rahega and network refetch request ho sakta h
@@ -39,7 +41,7 @@ function RQSuperheroes() {
 	// refetchOnWindowFocus : whenever app window will loose focus and again gain it , background refetch will occure to keep data in sync with BE
 	// refetchInterval: har 2sec me api call hoga but window is not focussed then refetch nahi hoga uske liye refetchInBackground ko true karo
 
-	if (isLoading) {
+	if (isFetching) {
 		return <p>Loading...</p>;
 	}
 
@@ -52,7 +54,13 @@ function RQSuperheroes() {
 			<button onClick={() => refetch()}>Fetch</button>
 			<div>
 				{data && data?.data
-					? data!.data?.map((e: any) => <p>{e?.name}</p>)
+					? data!.data?.map((e: any) => (
+							<div key={e.id}>
+								<Link to={`/rq-superhero/${e.id}`}>
+									{e?.name}
+								</Link>
+							</div>
+					  ))
 					: null}
 			</div>
 		</div>
