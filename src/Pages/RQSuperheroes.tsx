@@ -1,11 +1,19 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import {
+	useQuery,
+	useMutation,
+	QueryClient,
+	useQueryClient,
+} from "@tanstack/react-query";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
 function RQSuperheroes() {
 	const QUERY_KEY = "superheroes";
 
+	const [name, setName] = useState("");
+	const [alterEgo, setAlterEgo] = useState("");
+	const queryClient = useQueryClient();
 	const onSuccess = (data: any) => {
 		console.log(data);
 	};
@@ -21,7 +29,6 @@ function RQSuperheroes() {
 				return axios.get("http://localhost:4000/superheroes");
 			},
 			{
-				enabled: false,
 				onSuccess,
 				onError,
 			}
@@ -41,6 +48,24 @@ function RQSuperheroes() {
 	// refetchOnWindowFocus : whenever app window will loose focus and again gain it , background refetch will occure to keep data in sync with BE
 	// refetchInterval: har 2sec me api call hoga but window is not focussed then refetch nahi hoga uske liye refetchInBackground ko true karo
 
+	const postSuperHeroes = (data: any) => {
+		return axios.post("http://localhost:4000/superheroes", data);
+	};
+
+	const { mutate: addHero } = useMutation(postSuperHeroes, {
+		onSuccess: () => {
+			queryClient.invalidateQueries([QUERY_KEY]);
+		},
+	});
+
+	const postSuperhero = () => {
+		const hero = {
+			name,
+			alterEgo,
+		};
+		addHero(hero);
+	};
+
 	if (isFetching) {
 		return <p>Loading...</p>;
 	}
@@ -51,7 +76,19 @@ function RQSuperheroes() {
 	return (
 		<div>
 			<h2>Super Heroes Page - React Query</h2>
-			<button onClick={() => refetch()}>Fetch</button>
+			<div>
+				<input
+					type="text"
+					onChange={(e) => setName(e.target.value)}
+					value={name}
+				/>
+				<input
+					type="text"
+					onChange={(e) => setAlterEgo(e.target.value)}
+					value={alterEgo}
+				/>
+				<button onClick={postSuperhero}>Save</button>
+			</div>
 			<div>
 				{data && data?.data
 					? data!.data?.map((e: any) => (
